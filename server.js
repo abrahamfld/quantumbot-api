@@ -137,6 +137,20 @@ app.get('/api/user', (req, res) => {
   res.json({ id, username, email: userEmail, role, userData });
 });
 
+
+// Home route
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    status: 'success',
+    message: 'Server is live and running',
+    timestamp: new Date().toISOString(),
+    apiEndpoints: {
+      getUser: '/api/user?userId=<id>&email=<email>',
+      // Add other available endpoints here
+    }
+  });
+});
+
 // Start server
 const PORT = 3000;
 app.listen(PORT, () => {
