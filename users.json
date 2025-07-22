@@ -1,0 +1,229 @@
+{
+  "users": [
+    {
+      "id": "user_1753136315986",
+      "email": "user@user.com",
+      "password": "1234",
+      "username": "user1",
+      "role": "admin",
+      "userData": {
+        "id": "user_1753136315986",
+        "firstName": "Trader",
+        "lastName": "2703",
+        "username": "user1",
+        "email": "user@user.com",
+        "role": "admin",
+        "balance": 841.3244341819316,
+        "totalProfit": 23.324434181931498,
+        "winCount": 20,
+        "totalTrades": 21,
+        "transactions": [
+          {
+            "id": 1753139165977,
+            "type": "deposit",
+            "amount": 419,
+            "date": "2025-07-21T23:06:05.977Z"
+          },
+          {
+            "id": 1753138001299,
+            "type": "deposit",
+            "amount": 399,
+            "date": "2025-07-21T22:46:41.299Z"
+          }
+        ],
+        "tradingHistory": [
+          {
+            "id": 1753139308264,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.0819113601128636,
+            "isWin": true,
+            "date": "2025-07-21T23:08:28.264Z"
+          },
+          {
+            "id": 1753139300270,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.7595905582297204,
+            "isWin": true,
+            "date": "2025-07-21T23:08:20.270Z"
+          },
+          {
+            "id": 1753139296331,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.6019193055236334,
+            "isWin": true,
+            "date": "2025-07-21T23:08:16.331Z"
+          },
+          {
+            "id": 1753139294275,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.149159533241682,
+            "isWin": true,
+            "date": "2025-07-21T23:08:14.275Z"
+          },
+          {
+            "id": 1753139282255,
+            "type": "buy",
+            "amount": 100,
+            "profit": 0.5362801172936784,
+            "isWin": true,
+            "date": "2025-07-21T23:08:02.255Z"
+          },
+          {
+            "id": 1753139274265,
+            "type": "buy",
+            "amount": 100,
+            "profit": 0.855105056527373,
+            "isWin": true,
+            "date": "2025-07-21T23:07:54.265Z"
+          },
+          {
+            "id": 1753139270255,
+            "type": "sell",
+            "amount": 100,
+            "profit": -1.3192323881437718,
+            "isWin": false,
+            "date": "2025-07-21T23:07:50.255Z"
+          },
+          {
+            "id": 1753139264272,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.7049521082628762,
+            "isWin": true,
+            "date": "2025-07-21T23:07:44.272Z"
+          },
+          {
+            "id": 1753139262267,
+            "type": "buy",
+            "amount": 100,
+            "profit": 0.9119206877856492,
+            "isWin": true,
+            "date": "2025-07-21T23:07:42.267Z"
+          },
+          {
+            "id": 1753139260283,
+            "type": "buy",
+            "amount": 100,
+            "profit": 0.9618869373815487,
+            "isWin": true,
+            "date": "2025-07-21T23:07:40.283Z"
+          },
+          {
+            "id": 1753139246268,
+            "type": "buy",
+            "amount": 100,
+            "profit": 0.7842955787962912,
+            "isWin": true,
+            "date": "2025-07-21T23:07:26.268Z"
+          },
+          {
+            "id": 1753139214253,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.5156740763322476,
+            "isWin": true,
+            "date": "2025-07-21T23:06:54.253Z"
+          },
+          {
+            "id": 1753139210252,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.0224911364549456,
+            "isWin": true,
+            "date": "2025-07-21T23:06:50.252Z"
+          },
+          {
+            "id": 1753139202263,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.3371860125856188,
+            "isWin": true,
+            "date": "2025-07-21T23:06:42.263Z"
+          },
+          {
+            "id": 1753139200260,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.6570596884733306,
+            "isWin": true,
+            "date": "2025-07-21T23:06:40.260Z"
+          },
+          {
+            "id": 1753139198264,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.5651359309368487,
+            "isWin": true,
+            "date": "2025-07-21T23:06:38.264Z"
+          },
+          {
+            "id": 1753139196277,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.4811363137379767,
+            "isWin": true,
+            "date": "2025-07-21T23:06:36.277Z"
+          },
+          {
+            "id": 1753139188262,
+            "type": "buy",
+            "amount": 100,
+            "profit": 0.9064136794541217,
+            "isWin": true,
+            "date": "2025-07-21T23:06:28.262Z"
+          },
+          {
+            "id": 1753139186261,
+            "type": "buy",
+            "amount": 100,
+            "profit": 0.8084341471524507,
+            "isWin": true,
+            "date": "2025-07-21T23:06:26.261Z"
+          },
+          {
+            "id": 1753139178274,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.1325683674584448,
+            "isWin": true,
+            "date": "2025-07-21T23:06:18.274Z"
+          },
+          {
+            "id": 1753138012262,
+            "type": "buy",
+            "amount": 100,
+            "profit": 1.8705459743339676,
+            "isWin": true,
+            "date": "2025-07-21T22:46:52.262Z"
+          }
+        ],
+        "lastUpdated": "2025-07-21T23:32:23.045Z"
+      }
+    },
+    {
+      "id": "user_1753139387799",
+      "email": "sam@sam.com",
+      "password": "1234",
+      "username": "sam1",
+      "role": "user",
+      "userData": {
+        "id": "user_1753139387799",
+        "firstName": "Trader",
+        "lastName": "5920",
+        "username": "sam1",
+        "email": "sam@sam.com",
+        "role": "user",
+        "balance": 0,
+        "totalProfit": 0,
+        "winCount": 0,
+        "totalTrades": 0,
+        "transactions": [],
+        "tradingHistory": []
+      }
+    }
+  ]
+}
