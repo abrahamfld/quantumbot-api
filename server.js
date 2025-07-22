@@ -1,142 +1,165 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 const cors = require('cors');
 
 const app = express();
-const DATA_FILE = path.join(__dirname, 'users.json');
 
-// Initialize users file if it doesn't exist
-if (!fs.existsSync(DATA_FILE)) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify({ users: [] }));
-}
+// MongoDB Atlas connection
+// MongoDB Atlas connection (corrected)
+mongoose.connect('mongodb+srv://quantumbot:Master%401234@cluster0.w45bvhe.mongodb.net/quantumbotDB?retryWrites=true&w=majority')
+.then(() => console.log('Connected to MongoDB Atlas'))
+.catch(err => console.error('MongoDB connection error:', err));
+
+// User Schema (matches your existing JSON structure)
+const userSchema = new mongoose.Schema({
+  id: String,
+  email: { type: String, unique: true },
+  password: String, // Still plaintext to match your current behavior
+  username: String,
+  role: String,
+  userData: {
+    id: String,
+    firstName: String,
+    lastName: String,
+    username: String,
+    email: String,
+    role: String,
+    balance: Number,
+    totalProfit: Number,
+    winCount: Number,
+    totalTrades: Number,
+    transactions: Array,
+    tradingHistory: Array
+  }
+});
+
+const User = mongoose.model('User', userSchema);
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Helper functions
-const getUsers = () => {
-  return JSON.parse(fs.readFileSync(DATA_FILE)).users;
-};
-
-const saveUsers = (users) => {
-  fs.writeFileSync(DATA_FILE, JSON.stringify({ users }, null, 2));
-};
-
-// Routes
+// Routes - Maintained identical response structure
 
 // Register
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { email, password, username } = req.body;
-  const users = getUsers();
 
-  // Basic validation
   if (!email || !password || !username) {
     return res.status(400).json({ error: 'Email, password, and username are required' });
   }
 
-  // Check if user exists
-  if (users.some(u => u.email === email)) {
-    return res.status(400).json({ error: 'Email already registered' });
-  }
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
 
-  // Create new user (password stored in plaintext - for learning only!)
-  const newUser = {
-    id: `user_${Date.now()}`,
-    email,
-    password, // Storing plaintext password - NOT secure for production!
-    username,
-    role: users.length === 0 ? 'admin' : 'user',
-    userData: {
+    const userCount = await User.countDocuments();
+    const newUser = new User({
       id: `user_${Date.now()}`,
-      firstName: "Trader",
-      lastName: Math.floor(1000 + Math.random() * 9000).toString(),
-      username,
       email,
-      role: users.length === 0 ? 'admin' : 'user',
-      balance: 0,
-      totalProfit: 0,
-      winCount: 0,
-      totalTrades: 0,
-      transactions: [],
-      tradingHistory: []
-    }
-  };
+      password, // Still plaintext
+      username,
+      role: userCount === 0 ? 'admin' : 'user',
+      userData: {
+        id: `user_${Date.now()}`,
+        firstName: "Trader",
+        lastName: Math.floor(1000 + Math.random() * 9000).toString(),
+        username,
+        email,
+        role: userCount === 0 ? 'admin' : 'user',
+        balance: 0,
+        totalProfit: 0,
+        winCount: 0,
+        totalTrades: 0,
+        transactions: [],
+        tradingHistory: []
+      }
+    });
 
-  users.push(newUser);
-  saveUsers(users);
+    await newUser.save();
 
-  res.json({ 
-    success: true,
-    user: {
-      id: newUser.id,
-      email: newUser.email,
-      username: newUser.username,
-      userData: newUser.userData
-    }
-  });
+    res.json({ 
+      success: true,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        username: newUser.username,
+        userData: newUser.userData
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // Login
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
-  const users = getUsers();
 
-  // Find user by email
-  const user = users.find(u => u.email === email);
-  
-  if (!user) {
-    return res.status(400).json({ error: 'User not found' });
-  }
-
-  // Compare plaintext passwords (NOT secure - for learning only!)
-  if (user.password !== password) {
-    return res.status(400).json({ error: 'Incorrect password' });
-  }
-
-  res.json({ 
-    success: true,
-    user: {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      userData: user.userData
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
     }
-  });
+
+    // Still plaintext comparison
+    if (user.password !== password) {
+      return res.status(400).json({ error: 'Incorrect password' });
+    }
+
+    res.json({ 
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        userData: user.userData
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // Save user data
-app.post('/api/save-data', (req, res) => {
+app.post('/api/save-data', async (req, res) => {
   const { userId, userData } = req.body;
-  const users = getUsers();
 
-  const userIndex = users.findIndex(u => u.id === userId);
-  if (userIndex === -1) {
-    return res.status(400).json({ error: 'User not found' });
+  try {
+    const user = await User.findOneAndUpdate(
+      { id: userId },
+      { userData },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
   }
-
-  users[userIndex].userData = userData;
-  saveUsers(users);
-
-  res.json({ success: true });
 });
 
 // Get user data by ID
-app.get('/api/user', (req, res) => {
+app.get('/api/user', async (req, res) => {
   const { userId, email } = req.query;
-  const users = getUsers();
 
-  const user = users.find(u => u.id === userId && u.email === email);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+  try {
+    const user = await User.findOne({ id: userId, email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const { id, username, email: userEmail, role, userData } = user;
+    res.json({ id, username, email: userEmail, role, userData });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
   }
-
-  // Return only necessary data (excluding password)
-  const { id, username, email: userEmail, role, userData } = user;
-  res.json({ id, username, email: userEmail, role, userData });
 });
-
 
 // Home route
 app.get('/', (req, res) => {
@@ -155,5 +178,5 @@ app.get('/', (req, res) => {
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`User data stored in: ${DATA_FILE}`);
+  console.log('Using MongoDB Atlas for data storage');
 });
