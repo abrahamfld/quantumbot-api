@@ -5,16 +5,17 @@ const cors = require('cors');
 const app = express();
 
 // MongoDB Atlas connection
+// MongoDB Atlas connection (corrected)
 mongoose.connect('mongodb+srv://quantumbot:Master%401234@cluster0.w45bvhe.mongodb.net/quantumbotDB?retryWrites=true&w=majority')
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-// User Schema with unique username
+// User Schema (matches your existing JSON structure)
 const userSchema = new mongoose.Schema({
   id: String,
   email: { type: String, unique: true },
-  password: String,
-  username: { type: String, unique: true }, // Added unique constraint
+  password: String, // Still plaintext to match your current behavior
+  username: String,
   role: String,
   userData: {
     id: String,
@@ -38,9 +39,9 @@ const User = mongoose.model('User', userSchema);
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Routes - Maintained identical response structure
 
-// Register (updated to check for duplicate username)
+// Register
 app.post('/api/register', async (req, res) => {
   const { email, password, username } = req.body;
 
@@ -49,28 +50,16 @@ app.post('/api/register', async (req, res) => {
   }
 
   try {
-    // Check for existing email or username
-    const existingUser = await User.findOne({ 
-      $or: [
-        { email },
-        { username }
-      ]
-    });
-    
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      if (existingUser.email === email) {
-        return res.status(400).json({ error: 'Email already registered' });
-      }
-      if (existingUser.username === username) {
-        return res.status(400).json({ error: 'Username already taken' });
-      }
+      return res.status(400).json({ error: 'Email already registered' });
     }
 
     const userCount = await User.countDocuments();
     const newUser = new User({
       id: `user_${Date.now()}`,
       email,
-      password,
+      password, // Still plaintext
       username,
       role: userCount === 0 ? 'admin' : 'user',
       userData: {
@@ -101,90 +90,7 @@ app.post('/api/register', async (req, res) => {
       }
     });
   } catch (err) {
-    if (err.code === 11000) { // MongoDB duplicate key error
-      if (err.keyPattern.email) {
-        return res.status(400).json({ error: 'Email already registered' });
-      }
-      if (err.keyPattern.username) {
-        return res.status(400).json({ error: 'Username already taken' });
-      }
-    }
     res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Get user data by ID or email (existing route)
-app.get('/api/user', async (req, res) => {
-  const { userId, email } = req.query;
-
-  try {
-    const user = await User.findOne({ 
-      $or: [
-        { id: userId },
-        { email }
-      ]
-    });
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const { id, username, email: userEmail, role, userData } = user;
-    res.json({ id, username, email: userEmail, role, userData });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// New route: Get user data by username
-app.get('/api/user/by-username/:username', async (req, res) => {
-  const { username } = req.params;
-
-  try {
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const { id, email, role, userData } = user;
-    res.json({ 
-      id,
-      username,
-      email,
-      role,
-      userData
-    });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Home route with database connection test
-app.get('/', async (req, res) => {
-  try {
-    await mongoose.connection.db.admin().ping();
-    
-    res.status(200).json({ 
-      status: 'success',
-      message: 'Server is live and running',
-      database: 'Connected to MongoDB Atlas',
-      timestamp: new Date().toISOString(),
-      apiEndpoints: {
-        getUser: '/api/user?userId=<id>&email=<email>',
-        getUserByUsername: '/api/user/by-username/<username>',
-        register: '/api/register (POST)',
-        login: '/api/login (POST)',
-        saveData: '/api/save-data (POST)'
-      }
-    });
-  } catch (err) {
-    res.status(500).json({ 
-      status: 'error',
-      message: 'Server is running but database connection failed',
-      database: 'Connection to MongoDB Atlas failed',
-      error: err.message,
-      timestamp: new Date().toISOString()
-    });
   }
 });
 
@@ -215,6 +121,57 @@ app.post('/api/login', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// Save user data
+app.post('/api/save-data', async (req, res) => {
+  const { userId, userData } = req.body;
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { id: userId },
+      { userData },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get user data by ID
+app.get('/api/user', async (req, res) => {
+  const { userId, email } = req.query;
+
+  try {
+    const user = await User.findOne({ id: userId, email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const { id, username, email: userEmail, role, userData } = user;
+    res.json({ id, username, email: userEmail, role, userData });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Home route
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    status: 'success',
+    message: 'Server is live and running',
+    timestamp: new Date().toISOString(),
+    apiEndpoints: {
+      getUser: '/api/user?userId=<id>&email=<email>',
+      // Add other available endpoints here
+    }
+  });
 });
 
 // Start server
