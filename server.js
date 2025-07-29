@@ -188,6 +188,35 @@ app.get('/', async (req, res) => {
   }
 });
 
+// Login
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    // Still plaintext comparison
+    if (user.password !== password) {
+      return res.status(400).json({ error: 'Incorrect password' });
+    }
+
+    res.json({ 
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        userData: user.userData
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Start server
 const PORT = 3000;
 app.listen(PORT, () => {
