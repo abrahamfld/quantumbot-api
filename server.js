@@ -5,7 +5,6 @@ const cors = require('cors');
 const app = express();
 
 // MongoDB Atlas connection
-// MongoDB Atlas connection (corrected)
 mongoose.connect('mongodb+srv://quantumbot:Master%401234@cluster0.w45bvhe.mongodb.net/quantumbotDB?retryWrites=true&w=majority')
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch(err => console.error('MongoDB connection error:', err));
@@ -161,6 +160,37 @@ app.get('/api/user', async (req, res) => {
   }
 });
 
+// NEW ROUTE: Get user by username (for search functionality)
+app.get('/api/user/by-username/:username', async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'User not found' 
+      });
+    }
+
+    // Return user data in the same format as your other endpoints
+    res.json({ 
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        userData: user.userData
+      }
+    });
+  } catch (err) {
+    console.error('Error searching user:', err);
+    res.status(500).json({ 
+      success: false,
+      error: 'Server error' 
+    });
+  }
+});
+
 // Home route
 app.get('/', (req, res) => {
   res.status(200).json({ 
@@ -169,7 +199,10 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     apiEndpoints: {
       getUser: '/api/user?userId=<id>&email=<email>',
-      // Add other available endpoints here
+      getUserByUsername: '/api/user/by-username/<username>',
+      login: '/api/login',
+      register: '/api/register',
+      saveData: '/api/save-data'
     }
   });
 });
